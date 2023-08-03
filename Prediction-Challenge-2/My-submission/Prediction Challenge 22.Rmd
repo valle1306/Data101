@@ -1,0 +1,56 @@
+---
+title: "Prediction Challenge 2 (2)"
+author: "Valerie Le"
+date: "2023-04-26"
+output: html_document
+---
+**Data load**
+```{r}
+library(rpart)
+library(rpart.plot)
+hire1 <- read.csv("C:/Users/lpnhu/Downloads/HireRTrain1-1.csv")
+```
+
+**Create new attributes**
+```{r}
+hire1$TotalFollowers <- hire1$TwitterFOLLOWERS + hire1$TikTokFOLLOWERS
+hire1$TotalFollowing <- hire1$TwitterFOLLOWING + hire1$TikTokTFOLLOWING
+hire1$Twitterfraction <- hire1$TwitterFOLLOWING/ hire1$TwitterFOLLOWERS
+hire1$Tiktokfraction <- hire1$TikTokTFOLLOWING/ hire1$TikTokFOLLOWERS
+hire1$sum <- (hire1$TikTokTFOLLOWING +
+                hire1$TwitterFOLLOWING)/ (hire1$TwitterFOLLOWERS + hire1$TikTokFOLLOWERS)
+```
+
+**Decision tree (1line)**
+```{r}
+tree <- rpart(Hired ~ ., data= hire1, method = "class", control= rpart.control(minsplit=20, cp= 0.0001))
+
+error <- mean(hire1$Hired!= predict(tree, hire1, type= "class"))
+error
+
+CrossValidation::cross_validate(hire1,tree,5,0.7)
+
+
+test <- read.csv("C:/Users/lpnhu/Downloads/test_challenge2.csv")
+
+
+test$TotalFollowers <- test$TwitterFOLLOWERS + test$TikTokFOLLOWERS
+
+test$TotalFollowing <- test$TwitterFOLLOWING + test$TikTokTFOLLOWING
+
+test$Twitterfraction <- test$TwitterFOLLOWING/ test$TwitterFOLLOWERS
+
+test$Tiktokfraction <- test$TikTokTFOLLOWING/ test$TikTokFOLLOWERS
+
+test$sum <- ((test$TikTokTFOLLOWING+test$TwitterFOLLOWING)/ (test$TwitterFOLLOWERS + test$TikTokFOLLOWERS))
+
+submission <-read.csv("C:/Users/lpnhu/Downloads/sample_submission2.csv")
+decision <- predict(tree,newdata = test, type= "class")
+
+submission$Prediction <- decision
+write.csv(submission,'mysubmissionchallenge2.csv',row.names = FALSE)
+
+
+```
+
+
