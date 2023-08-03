@@ -1,0 +1,483 @@
+---
+title: "Prediction Challenge 1"
+author: "Valerie Le"
+date: "2023-04-16"
+output: html_document
+---
+
+**Data load**
+```{r}
+hire <- read.csv("C:/Users/lpnhu/Downloads/HireTrainApr10.csv")
+```
+
+**Data exploration**
+```{r}
+nrow(hire)
+colnames(hire)
+unique(hire$Coding)
+unique(hire$Impression)
+unique(hire$Major)
+unique(hire$College)
+unique(hire$Hired)
+```
+**Use chi-squared test to test each variable relationship to the predicted column (hired)**
+In sum, candidates' _major_ influences whether they get hired or not. Hence, _major_ would less likely to play a role in prediction model.
+```{r}
+#H01: Candidates' coding skill is independent of whether they get hired or not
+#Ha1: Candidates's coding skill influences whether they get hired
+chisq.test(hire$Hired,hire$Coding)
+#H02: Candidates' first impression is independent of whether they get hired or not
+#Ha2: Candidates's impression influences whether they get hired
+chisq.test(hire$Hired,hire$Impression)
+#H03: Candidates' major is independent of whether they get hired or not
+#Ha3: Candiates's major influences whether they get hired
+chisq.test(hire$Hired,hire$Major)
+#H04: Candiates'college is independent of whether they get hired or not
+#H02: Candidates's college influences whether they get hired
+chisq.test(hire$Hired,hire$College)
+```
+**Use table() for subsets of the HireTrain data set. Find such subsets which are "decisive" either with vrery large proportion of Hired = 'Yes' or with very high proportion of Hired = 'No'**
+
+```{r}
+table(hire$Hired)
+table(hire[hire$Coding=='Excellent',]$Hired)
+#Excellent and nerdy seems to be a great patternt to get hired
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Nerdy',]$Hired)
+```
+
+IT+ nerdy+ any school except BestCollege coding skills seem to be a decisive pattern.
+```{r}
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Nerdy'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Nerdy'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Nerdy'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Nerdy'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Nerdy'& hire$College=='Peters',]$Hired)
+```
+Excellent+ Outgoing+ any school except BestCollege coding skills seem to be a decisive pattern.
+```{r}
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Outgoing'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Outgoing'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Outgoing'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Outgoing'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Outgoing'& hire$College=='Peters',]$Hired)
+```
+Excellent + Confident + any major seems to be the pattern for hiring
+```{r}
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Confident'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Confident'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Confident'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Confident'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Confident'& hire$College=='Peters',]$Hired)
+```
+Excellent + Shy + any major seems to be the pattern for hiring. Moreover, Data Sciences and Stats major have 100% chance of hiring
+
+```{r}
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Shy'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Shy'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Shy'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Shy'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='Excellent' & hire$Impression== 'Shy'& hire$College=='Peters',]$Hired)
+```
+_Testing Coding skill = Weak_
+```{r}
+table(hire[hire$Coding=='Weak',]$Hired)
+```
+Weak coding skill + Nerdy  seems to get REJECTED. 
+```{r}
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Nerdy'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Nerdy'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Nerdy'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Nerdy'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Nerdy'& hire$College=='Peters',]$Hired)
+```
+Weak + Outgoing + any major seems to be the pattern for NOT hiring!!
+```{r}
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Outgoing'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Outgoing'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Outgoing'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Outgoing'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Outgoing'& hire$College=='Peters',]$Hired)
+```
+Weak + Confident + any major seems to be the pattern for NOT hiring!!
+```{r}
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Confident'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Confident'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Confident'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Confident'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Confident'& hire$College=='Peters',]$Hired)
+```
+
+Weak + Shy + any major seems to be the pattern for NOT hiring. 
+
+```{r}
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Shy'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Shy'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Shy'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Shy'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='Weak' & hire$Impression== 'Shy'& hire$College=='Peters',]$Hired)
+```
+
+_Testing Coding skill = OK_
+```{r}
+table(hire[hire$Coding=='OK',]$Hired)
+```
+OK coding skill + Nerdy + Best College has 100% chance of getting rejected
+
+```{r}
+table(hire[hire$Coding=='OK' & hire$Impression== 'Nerdy'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Nerdy'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Nerdy'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Nerdy'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Nerdy'& hire$College=='Peters',]$Hired)
+```
+OK + Outgoing + any major seems to be the pattern for hiring!!
+```{r}
+table(hire[hire$Coding=='OK' & hire$Impression== 'Outgoing'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Outgoing'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Outgoing'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Outgoing'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Outgoing'& hire$College=='Peters',]$Hired)
+```
+OK + Confident + any major seems to be the pattern for hiring!!
+```{r}
+table(hire[hire$Coding=='OK' & hire$Impression== 'Confident'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Confident'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Outgoing'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Confident'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Confident'& hire$College=='Peters',]$Hired)
+```
+
+OK + Shy + Best College have 100% chance of getting REJECTED
+
+```{r}
+table(hire[hire$Coding=='OK' & hire$Impression== 'Shy'& hire$College=='Redbrick',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Shy'& hire$College=='PJIT',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Shy'& hire$College=='BYU',]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Shy'& hire$College=='BestCollege' ,]$Hired)
+table(hire[hire$Coding=='OK' & hire$Impression== 'Shy'& hire$College=='Peters',]$Hired)
+```
+
+**Prediction Model**
+excellent + nerdy + bestcollege doesn't have an obvious pattern
+```{r}
+myprediction <- hire1
+decision <-rep('No',nrow(myprediction))
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BYU' & myprediction$TwitterFOLLOWERS <62] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BYU' & myprediction$TwitterFOLLOWERS >9243] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BYU' & myprediction$TwitterFOLLOWING <442] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BYU' &  myprediction$TwitterFOLLOWING >9878] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BYU' & myprediction$TikTokFOLLOWERS >9731] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BYU' & myprediction$TikTokFOLLOWING <295] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Peters' &   myprediction$TwitterFOLLOWERS >8558] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Peters' & myprediction$TwitterFOLLOWING <563] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Peters' &  myprediction$TwitterFOLLOWING >9607] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Peters' &   myprediction$TikTokFOLLOWERS < 277] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Peters' &     myprediction$TikTokFOLLOWERS > 9529] <- 'Yes'
+
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Peters' & myprediction$TikTokFOLLOWING <524] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Peters' & myprediction$TikTokFOLLOWING > 9621] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'PJIT' &   myprediction$TwitterFOLLOWERS < 179] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'PJIT' & myprediction$TwitterFOLLOWING <141] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'PJIT' &  myprediction$TwitterFOLLOWING >9062] <- 'Yes'
+
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'PJIT' &     myprediction$TikTokFOLLOWERS > 8663] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'PJIT' & myprediction$TikTokFOLLOWING <133] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'PJIT' & myprediction$TikTokFOLLOWING > 9744] <- 'Yes'
+
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BestCollege' &   myprediction$TwitterFOLLOWERS > 9140] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BestCollege' & myprediction$TwitterFOLLOWING <225] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BestCollege' & myprediction$TwitterFOLLOWING >9696] <- 'Yes'
+
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BestCollege' &     myprediction$TikTokFOLLOWERS > 7883] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'BestCollege' & myprediction$TikTokFOLLOWING <1672] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Redbrick' & myprediction$TwitterFOLLOWING <1467] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Redbrick' & myprediction$TwitterFOLLOWING >9855] <- 'Yes'
+
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Redbrick' &     myprediction$TikTokFOLLOWERS > 6650] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Redbrick' & myprediction$TikTokFOLLOWING <250] <- 'Yes'
+
+decision[myprediction$Coding == 'Excellent' & myprediction$College == 'Redbrick' & myprediction$TikTokFOLLOWING >9772] <- 'Yes'
+
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'BYU' &   myprediction$TwitterFOLLOWERS >9674] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'BYU' & myprediction$TwitterFOLLOWING <1523] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'BYU' & myprediction$TwitterFOLLOWING >9757] <- 'Yes'
+
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'BYU' & myprediction$TikTokFOLLOWERS >9828 ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'BYU' & myprediction$TikTokFOLLOWING <9398 ] <- 'Yes'
+
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Peters' &   myprediction$TwitterFOLLOWERS >9621] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Peters' &   myprediction$TwitterFOLLOWERS <232] <- 'Yes'
+
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Peters' & myprediction$TwitterFOLLOWING <393 ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Peters' & myprediction$TwitterFOLLOWING >8384 ] <- 'Yes'
+
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Peters' & myprediction$TikTokFOLLOWERS >9156 ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Peters' & myprediction$TikTokFOLLOWING <150  ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Peters' & myprediction$TikTokFOLLOWING >9836   ] <- 'Yes'
+
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'PJIT' &   myprediction$TwitterFOLLOWERS <443] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'PJIT' &   myprediction$TwitterFOLLOWERS >9167] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'PJIT' & myprediction$TwitterFOLLOWING <511 ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'PJIT' & myprediction$TikTokFOLLOWERS >7436 ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'BestCollege' &   myprediction$TwitterFOLLOWERS >9687] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'BestCollege' & myprediction$TwitterFOLLOWING >9844 ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Redbrick' &      myprediction$TwitterFOLLOWERS >9029] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Redbrick' & myprediction$TwitterFOLLOWING <719 ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Redbrick' &  myprediction$TwitterFOLLOWING >9626 ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Redbrick' & myprediction$TikTokFOLLOWERS <341] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Redbrick' & myprediction$TikTokFOLLOWERS >5721] <- 'Yes'
+
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Redbrick' & myprediction$TikTokFOLLOWING <669  ] <- 'Yes'
+
+decision[myprediction$Coding == 'OK' & myprediction$College == 'Redbrick' & myprediction$TikTokFOLLOWING >9384   ] <- 'Yes'
+
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'BYU' &  myprediction$TwitterFOLLOWERS >9577] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'Peters' &      myprediction$TwitterFOLLOWERS >8882 ] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'Peters' & myprediction$TikTokFOLLOWERS >7610 ] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'Peters' & myprediction$TikTokFOLLOWING >9916    ] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'PJIT' &   myprediction$TwitterFOLLOWERS >9400] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'PJIT' & myprediction$TwitterFOLLOWING <519] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'PJIT' &     myprediction$TikTokFOLLOWERS <91] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'PJIT' & myprediction$TikTokFOLLOWING <262] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'BestCollege' &   myprediction$TwitterFOLLOWERS >9409] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'BestCollege' & myprediction$TwitterFOLLOWING >9975] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'BestCollege' &     myprediction$TikTokFOLLOWERS >9535 ] <- 'Yes'
+
+decision[myprediction$Coding == 'Weak' & myprediction$College == 'BestCollege' & myprediction$TikTokFOLLOWING <372] <- 'Yes'
+
+
+#Coding Skill is Excellent
+decision[myprediction$Coding=='Excellent'] <- 'Yes'
+#Coding skill is OK
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='Redbrick'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='PJIT'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='BYU'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='Peters'] <- 'Yes'
+
+
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Outgoing'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Confident'] <- 'Yes'
+
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='Redbrick'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='PJIT'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='BYU'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='Peters'] <- 'Yes'
+
+#Coding Skill is Weak
+decision[myprediction$Coding=='Weak' & myprediction$Impression== 'Nerdy' & myprediction$College=='Redbrick'] <- 'Yes'
+
+myprediction$Hired <- decision
+error <- mean(hire1$Hired!= myprediction$Hired)
+error
+```
+**One-step crossvalidation**
+```{r}
+v<-sample(1:nrow(hire))
+v[1:5]
+hireScrambled<-hire[v, ]
+#one step cross-validation
+hireSample<-hireScrambled[nrow(hireScrambled)-10:nrow(hireScrambled), ]
+myprediction<-hireSample
+decision <-rep('No',nrow(myprediction))
+
+#Coding Skill is Excellent
+decision[myprediction$Coding=='Excellent'] <- 'Yes'
+#Coding skill is OK
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='Redbrick'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='PJIT'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='BYU'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='Peters'] <- 'Yes'
+
+
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Outgoing'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Confident'] <- 'Yes'
+
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='Redbrick'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='PJIT'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='BYU'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='Peters'] <- 'Yes'
+
+#Coding Skill is Weak
+decision[myprediction$Coding=='Weak' & myprediction$Impression== 'Nerdy' & myprediction$College=='Redbrick'] <- 'Yes'
+
+myprediction$Hired <- decision
+error <- mean(hireSample$Hired!= myprediction$Hired)
+error
+
+#scramble the hire frame
+v<-sample(1:nrow(hire))
+v[1:5]
+hireScrambled<-hire[v, ]
+#one step crossvalidation
+hireSample<-hireScrambled[nrow(hireScrambled)-10:nrow(hireScrambled), ]
+myprediction<-hireSample
+decision <-rep('No',nrow(myprediction))
+#Coding Skill is Excellent
+decision[myprediction$Coding=='Excellent'] <- 'Yes'
+#Coding skill is OK
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='Redbrick'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='PJIT'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='BYU'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='Peters'] <- 'Yes'
+
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Outgoing'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Confident'] <- 'Yes'
+ 
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='Redbrick'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='PJIT'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='BYU'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='Peters'] <- 'Yes'
+ 
+#Coding Skill is Weak
+decision[myprediction$Coding=='Weak' & myprediction$Impression== 'Nerdy' & myprediction$College=='Redbrick'] <- 'Yes'
+
+
+
+myprediction$Hired <- decision
+error <- mean(hireSample$Hired!= myprediction$Hired)
+error
+```
+**ADDITIONALLY**
+_Getting to know the data_
+```{r}
+colnames(hire)
+summary(hire)
+unique(hire$Coding)
+nrow(hire)
+unique(hire$Major)
+unique(hire$College)
+table(hire$Coding)
+table(hire$Major)
+table(hire$Impression)
+table(hire$College)
+```
+
+Did you know that students who comes from RedBrick are more outgoing than students from other schools?
+
+```{r}
+table(hire$College,hire$Impression)
+```
+
+Did you know that students who are confident have ~64% of getting hired?
+```{r}
+table(hire$Impression,hire$Hired)
+```
+
+What are the odds that students have weak coding skills from Best College get hired?
+
+[ANS]: Posterior odds = 0.2856
+Likelihood ratio = .17
+Prior Odds = 1.68
+```{r}
+#Belief: Candidate get hired
+#Observation: Weak coding skills
+Prior<-nrow(hire[hire$Hired =='Yes',])/nrow(hire)
+Prior
+PriorOdds<-round(Prior/(1-Prior),2)
+PriorOdds
+TruePositive<-round(nrow(hire[hire$Hired=='Yes'& hire$Coding=='Weak'& hire$College== 'BestCollege',])/nrow(hire[hire$Coding=='Weak',]),2)
+TruePositive
+FalsePositive<-round(nrow(hire[hire$Hired!='Yes'& hire$Coding=='Weak' &hire$College =='BestCollege',])/nrow(hire[hire$Hired!='Weak',]),2)
+FalsePositive
+LikelihoodRatio<-round(TruePositive/FalsePositive,2)
+LikelihoodRatio
+PosteriorOdds <-LikelihoodRatio * PriorOdds
+PosteriorOdds
+Posterior <-PosteriorOdds/(1+PosteriorOdds)
+Posterior
+```
+
+**Preparing submission.csv for Kaggle**
+```{r}
+test <- read.csv("C:/Users/lpnhu/Downloads/test_challenge1.csv")
+submission <- read.csv("C:/Users/lpnhu/Downloads/sample_submission_challenge1.csv")
+
+myprediction <- test
+decision <-rep('No',nrow(myprediction))
+
+#Coding Skill is Excellent
+decision[myprediction$Coding=='Excellent'] <- 'Yes'
+#Coding skill is OK
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='Redbrick'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='PJIT'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='BYU'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Nerdy' & myprediction$College=='Peters'] <- 'Yes'
+
+
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Outgoing'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Confident'] <- 'Yes'
+
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='Redbrick'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='PJIT'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='BYU'] <- 'Yes'
+decision[myprediction$Coding=='OK' & myprediction$Impression== 'Shy' & myprediction$College=='Peters'] <- 'Yes'
+
+#Coding Skill is Weak
+decision[myprediction$Coding=='Weak' & myprediction$Impression== 'Nerdy' & myprediction$College=='Redbrick'] <- 'Yes'
+
+submission$Prediction <- decision
+write.csv(submission,'mysubmission1.csv',row.names = FALSE)
+```
