@@ -1,0 +1,164 @@
+---
+title: "Project 1_ Data101"
+author: "Valerie Le"
+date: "2023-03-02"
+output: html_document
+---
+**Data load**
+```{r}
+women <- read.csv("C:/Users/lpnhu/Downloads/makeovermonday-2020w10/makeovermonday-2020w10/20200306 Data International Women's Day Viz5 Launch.csv")
+wo <- subset(women, women$Value != "NA")
+```
+##Rename
+```{r}
+library(dplyr)
+wo <- wo %>%
+    mutate(Question = recode(Question, '... for at least one specific reason' = '>=1 reason', '... if she argues with him' = 'Arguing', '... if she burns the food'  =  'Burning food', '... if she goes out without telling him' = 'Going out without telling', '... if she neglects the children' = 'Neglecting children', '... if she refuses to have sex with him' = 'Refusing to have sex'))
+
+wo <- wo %>%
+        mutate(Survey.Year = recode(Survey.Year, '01/01/2015' = '2015', '01/01/2017' = '2017', '01/01/2006'  =  '2006', '01/01/2014' = '2014', '01/01/2008' = '2008', '01/01/2010' = '2010', '01/01/2016'='2016', '01/01/2011'='2011', '01/01/2012'= '2012', '01/01/2013' = '2013', '01/01/2002' = '2002', '01/01/2018' = '2018', '01/01/2009'= '2009', '01/01/2005'= '2005', '01/01/2003' = '2003', '01/01/2001' = '2001', '01/01/2000' = '2000', '01/01/2013' = '2013', '01/01/2007'= '2007'))
+
+```
+
+##General
+```{r}
+#Percentage per group
+table(wo$Gender)
+perwomen = 6143/(6143+5044)*100
+permen = 100- perwomen
+library(plotrix)
+slices <- c(45.1,54.9)
+lbls <- c("Male - 54.9%", "Female - 45.1%")
+pie3D(slices,labels=lbls,explode=0.1,
+   main="Pie Chart of Gender ")
+#Percentage per education
+wosubset <- subset(wo, wo$Demographics.Question== 'Education', select = c(4,5))
+table(wosubset$Demographics.Response)
+highered = 752/2942 *100
+noed = 704/2942*100
+primaryed = 728/2942*100
+secondaryed = 758/2942*100
+slices <- c(25.6,23.9,24.8,25.8)
+lbls <- c("Higher ed - 25.6%", "No ed - 23.9%", "Primary - 24.8%", "Secondary - 25.8%")
+pie3D(slices,labels=lbls,explode=0.1,
+   main="Pie Chart of Education ")
+#Percentage per marital status
+wosubset1 <- subset(wo,wo$Demographics.Question=='Marital status', select = c(4,5))
+table(wosubset1$Demographics.Response)
+married = 758/2221*100
+nevermarried = 711/2221*100
+negative = 100- married - nevermarried
+slices <- c(34.1,33.9,32)
+lbls <- c("Married", "Widowed/ Separated/ Divorced", "Never married")
+pie3D(slices,labels=lbls,explode=0.1,
+   main="Pie Chart of Marital Status ")
+```
+
+There is no obvious pattern that the Survey Year affect the percentage of people who agrees that a husband is justified to hit women 
+```{r}
+plot(wo$Survey.Year, wo$Value, ylab= "Value", xlab = "Year of Survey", main = "Survey year vs Values", col= cm.colors(12))
+lines(predict(lm(wo$Value~wo$Survey.Year)),col='black')
+
+```
+
+
+```{r}
+#Value vs Country
+tapply(wo$Value,wo$Country,mean)
+barplot(tapply(wo$Value,wo$Country,mean),las=3,cex.names=1, col= terrain.colors(12), ylab= "Mean", main= "People who think violence against women is okay- Countrywise")
+#Value vs Gender
+tapply(wo$Value,wo$Gender,mean)
+barplot(tapply(wo$Value,wo$Gender,mean), col= c("palegreen2","seagreen2"), ylab= "Mean", main= "People who think violence against women is okay- Genderwise")
+#Value vs Demographic Questions
+tapply(wo$Value,wo$Demographics.Question,mean)
+barplot(tapply(wo$Value,wo$Demographics.Question,mean), col= c("lightpink2","hotpink1","plum2","purple1","slateblue1"), ylab= "Mean", main= "People who think violence against women is okay- Demographic Question wise")
+#Value vs Demographic Response
+##Age
+tapply(wo[wo$Demographics.Question=='Age',]$Value,wo[wo$Demographics.Question=='Age',]$Demographics.Response,mean)
+barplot(tapply(wo[wo$Demographics.Question=='Age',]$Value,wo[wo$Demographics.Question=='Age',]$Demographics.Response,mean), col = hsv(seq(0,1 - 1/12,length.out = 12), 0.5 , 1), ylab= "Mean", main= "People who think violence against women is okay- Age wise")
+##Marital Status
+tapply(wo[wo$Demographics.Question=='Marital status',]$Value,wo[wo$Demographics.Question=='Marital status',]$Demographics.Response,mean)
+barplot(tapply(wo[wo$Demographics.Question=='Marital status',]$Value,wo[wo$Demographics.Question=='Marital status',]$Demographics.Response,mean), col= topo.colors(12),ylab= "Mean", main= "People who think violence against women is okay- Marital status- wise")
+##Education
+tapply(wo[wo$Demographics.Question=='Education',]$Value,wo[wo$Demographics.Question=='Education',]$Demographics.Response,mean)
+barplot(tapply(wo[wo$Demographics.Question=='Education',]$Value,wo[wo$Demographics.Question=='Education',]$Demographics.Response,mean), col= c("lemonchiffon","yellow1","thistle1","violet","slateblue2","lightpink"),ylab= "Mean", main= "People who think violence against women is okay- Education-wise")
+##Employment
+tapply(wo[wo$Demographics.Question=='Employment',]$Value,wo[wo$Demographics.Question=='Employment',]$Demographics.Response,mean)
+barplot(tapply(wo[wo$Demographics.Question=='Employment',]$Value,wo[wo$Demographics.Question=='Employment',]$Demographics.Response,mean), col= cm.colors(12),ylab= "Mean", main= "People who think violence against women is okay- Employment- wise")
+##Residence
+tapply(wo[wo$Demographics.Question=='Residence',]$Value,wo[wo$Demographics.Question=='Residence',]$Demographics.Response,mean)
+barplot(tapply(wo[wo$Demographics.Question=='Residence',]$Value,wo[wo$Demographics.Question=='Residence',]$Demographics.Response,mean), col= c("lemonchiffon","yellow1","thistle1","violet","slateblue2","lightpink"),ylab= "Mean", main= "People who think violence against women is okay- Residence-wise")
+```
+
+## More Plots
+Women got beaten for at least one or more specific reason
+```{r}
+unique(wo$Question)
+tapply(wo$Value,wo$Question,mean)
+woquestion <- tapply(wo$Value,wo$Question,mean)
+barplot(tapply(wo$Value,wo$Question,mean),las=2, cex.names=1, col = heat.colors(12), horiz = TRUE,xlab= "Mean", main= "People who think violence against women is okay")
+```
+##Is there any correlation between demographics and the reason women get beaten?
+*Age-wise*
+```{r}
+
+wo1 <- tapply(wo[wo$Demographics.Question=='Age'& wo$Demographics.Response =='15-24',]$Value,wo[wo$Demographics.Question=='Age'& wo$Demographics.Response =='15-24',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = cm.colors(12),las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Age from 15-24")
+wo2 <- tapply(wo[wo$Demographics.Question=='Age'& wo$Demographics.Response =='25-34',]$Value,wo[wo$Demographics.Question=='Age'& wo$Demographics.Response =='25-34',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = terrain.colors(12),las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Age from 25-34")
+wo3 <- tapply(wo[wo$Demographics.Question=='Age'& wo$Demographics.Response =='35-49',]$Value,wo[wo$Demographics.Question=='Age'& wo$Demographics.Response =='35-49',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = hsv(seq(0,1 - 1/12,length.out = 12)), 1 , 1,las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Age from 35-49")
+```
+*Education-wise*
+
+```{r}
+wo11 <- tapply(wo[wo$Demographics.Question=='Education'& wo$Demographics.Response =='No education',]$Value,wo[wo$Demographics.Question=='Education'& wo$Demographics.Response =='No education',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = cm.colors(12),las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Uneducated")
+wo22 <- tapply(wo[wo$Demographics.Question=='Education'& wo$Demographics.Response =='Primary',]$Value,wo[wo$Demographics.Question=='Education'& wo$Demographics.Response =='Primary',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = terrain.colors(12),las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Primary school level")
+wo33 <- tapply(wo[wo$Demographics.Question=='Education'& wo$Demographics.Response =='Secondary',]$Value,wo[wo$Demographics.Question=='Education'& wo$Demographics.Response =='Secondary',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = hsv(seq(0,1 - 1/12,length.out = 12)), 1 , 1,las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Secondary school level")
+wo44 <- tapply(wo[wo$Demographics.Question=='Education'& wo$Demographics.Response =='Higher',]$Value,wo[wo$Demographics.Question=='Education'& wo$Demographics.Response =='Higher',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = hsv(seq(0,1 - 1/12,length.out = 12)), 1 , 1,las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Higher school level")
+```
+**Employment-wise**
+
+
+```{r}
+wo111 <- tapply(wo[wo$Demographics.Question=='Employment'& wo$Demographics.Response =='Employed for kind',]$Value,wo[wo$Demographics.Question=='Employment'& wo$Demographics.Response =='Employed for kind',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = cm.colors(12),las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Employed for kind")
+wo222 <- tapply(wo[wo$Demographics.Question=='Employment'& wo$Demographics.Response =='Employed for cash',]$Value,wo[wo$Demographics.Question=='Employment'& wo$Demographics.Response =='Employed for cash',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = terrain.colors(12),las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Employed for cash")
+wo33 <- tapply(wo[wo$Demographics.Question=='Employment'& wo$Demographics.Response =='Unemployed',]$Value,wo[wo$Demographics.Question=='Employment'& wo$Demographics.Response =='Unemployed',]$Question,mean)
+barplot(wo1,horiz= TRUE, col = hsv(seq(0,1 - 1/12,length.out = 12)), 1 , 1,las=2, cex.names=1, xlab = "Total of responses", main = "Reason women got beaten- Unemployed")
+```
+
+**Testing hypotheses**
+
+Ho: women who are uneducated think it is okay when "A husband is justified in hitting or beating his wife if she argues with him" have the same average mean value as men who are uneducated.
+Ha1: women who are uneducated think it is okay when "A husband is justified in hitting or beating his wife if she argues with him" have the higher average mean value as men who are uneducated.
+
+```{r}
+barplot(tapply(wo[wo$Question== 'Arguing'& wo$Demographics.Response== 'No education',]$Value,wo[wo$Question== 'Arguing'& wo$Demographics.Response== 'No education',]$Gender,mean), col= topo.colors(2),xlab= "Total responses", ylab= "Mean",main="Uneducated people by gender who thinks it is okay to hit women")
+women1 <- subset(wo[wo$Question== 'Arguing'& wo$Demographics.Response== 'No education',],select = c(3,8))
+mean(women1[women1$Gender== 'F',]$Value)
+mean(women1[women1$Gender== 'M',]$Value)
+ZTest::z_test_from_data(women1,"Gender","Value","M","F")
+
+#Reject null hypothesis -> women who are uneducated think it is okay when "A husband is justified in hitting or beating his wife if she argues with him" have the higher average mean value as men who are uneducated.
+```
+
+H02: Women who have higher education think it is okay if the husband hit his wife if she burns food has the same average mean compared to men who have higher education
+Ha2: Women who have higher education think it is okay if the husband hit his wife it she burns food has higher average mean compared to men who have higher education
+
+
+```{r}
+barplot(tapply(wo[wo$Question== 'Burning food'& wo$Demographics.Response== 'Higher',]$Value,wo[wo$Question== 'Burning food'& wo$Demographics.Response== 'Higher',]$Gender,mean), col= topo.colors(2),xlab= "Total responses", ylab= "Mean",main="Educated people by gender who thinks it is okay to hit women")
+women1 <- subset(wo[wo$Question== 'Burning food'& wo$Demographics.Response== 'Higher',],select = c(3,8))
+mean(women1[women1$Gender== 'F',]$Value)
+mean(women1[women1$Gender== 'M',]$Value)
+ZTest::z_test_from_data(women1,"Gender","Value","M","F")
+
+#Unable to Reject null hypothesis -> Women who have higher education think it is okay if the husband hit his wife it she burns food has higher average mean compared to men who have higher education.
+```
+
